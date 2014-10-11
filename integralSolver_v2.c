@@ -10,6 +10,8 @@
 #include <time.h>
 #include <omp.h>
 
+#define BILLION 1E9
+
 double tolerance, delta, total_area = 0.0;
 int type, working = 0;
 
@@ -161,8 +163,8 @@ void calcArea ()
 
 int main (int argc, char* argv[])
 {
-  clock_t t;
-  double min_a, max_b, range, width;
+  struct timespec begin, end;
+  double min_a, max_b, range, width, time;
   int i, num_task = omp_get_max_threads();
 
   if (argc < 4)
@@ -198,7 +200,7 @@ int main (int argc, char* argv[])
   tolerance = pow (10.0, -20);
   delta = pow(10.0, -5);
   
-  t = clock();
+  clock_gettime(CLOCK_REALTIME, &begin);
 
   width = range / num_task;  
   for (i = 0; i < num_task; i++)
@@ -210,10 +212,13 @@ int main (int argc, char* argv[])
   #pragma omp parallel
   calcArea ();
   
-  t = clock() - t;
+  clock_gettime(CLOCK_REALTIME, &end);
 
-  printf ("Area (a=%.2f, b=%.2f): %f\ntime: %fs", min_a, max_b, total_area,
-          (double) t/CLOCKS_PER_SEC);
+  time = (end.tv_sec - begin.tv_sec) +
+         (end.tv_nsec - begin.tv_nsec) / BILLION;
+
+  printf ("Area (a=%.2f, b=%.2f): %f\n", min_a, max_b, total_area);
+  printf ("Time: %fs\n", time);
 
   return 0;
 }

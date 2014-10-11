@@ -10,6 +10,8 @@
 #include <time.h>
 #include <omp.h>
 
+#define BILLION 1E9
+
 double tolerance;
 double delta;
 int type;
@@ -76,8 +78,9 @@ double calcArea (double a, double b)
 
 int main (int argc, char* argv[])
 {
-  clock_t t;
-  double totalArea = 0.0, minA, maxB;
+  struct timespec begin, end;
+  double total_area = 0.0, min_a, max_b, time;
+
   if (argc < 4)
   {
     printf ("Available functions: \n");
@@ -91,8 +94,8 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  minA = atof (argv[1]);
-  maxB = atof (argv[2]);
+  min_a = atof (argv[1]);
+  max_b = atof (argv[2]);
   type = atoi (argv[3]);
 
   if (type < 1 || type > 4)
@@ -104,28 +107,31 @@ int main (int argc, char* argv[])
   tolerance = pow (10.0, -20);
   delta = pow(10.0, -5);
   
-  t = clock();
+  clock_gettime(CLOCK_REALTIME, &begin);
 
   #pragma omp parallel
   {
     double a, b, area;
-    double range = maxB - minA;
+    double range = max_b - min_a;
     int threadId = omp_get_thread_num ();
     int numThreads = omp_get_num_threads ();
 
-    a = threadId * (range/numThreads) + minA;
+    a = threadId * (range/numThreads) + min_a;
     b = a + range/numThreads;
     
     area = calcArea (a, b);
     
     #pragma omp critical
-    totalArea += area;
+    total_area += area;
   }
   
-  t = clock() - t;
+  clock_gettime(CLOCK_REALTIME, &end);
 
-  printf ("Area (a=%.2f, b=%.2f): %f\ntime: %fs", minA, maxB, totalArea,
-          (double) t/CLOCKS_PER_SEC);
+  time = (end.tv_sec - begin.tv_sec) +
+         (end.tv_nsec - begin.tv_nsec) / BILLION;
+
+  printf ("Area (a=%.2f, b=%.2f): %f\n", min_a, max_b, total_area);
+  printf ("Time: %fs\n", time);
 
   return 0;
 }
