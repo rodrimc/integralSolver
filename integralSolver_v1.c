@@ -25,11 +25,18 @@ double f (double x)
       }
     case 2:
       {
-        value = x * sin(x) + 10;
+        value = x * sin(x) + 10.0;
+        break;
       }
     case 3:
       {
         value = pow (x, 2.0) + pow (x, 3.0);
+        break;
+      }
+    case 4:
+      {
+        value = sin(x) + 1.0;
+        break;
       }
   }
 
@@ -38,7 +45,7 @@ double f (double x)
 
 double area (double a, double b)
 {
-  return (((f(a) + f(b)) / 2.0) *  (b - a)); 
+  return  (b - a) * (f(a) + f(b)) / 2.0; 
 }
 
 double calcArea (double a, double b)
@@ -53,7 +60,7 @@ double calcArea (double a, double b)
  
   value = largerArea;
   diff = largerArea - (smallerArea1 + smallerArea2);
-  if (fabs(diff) > tolerance && fabs(b - a) > delta)
+  if (fabs(diff) > tolerance)
   {
     double area1, area2;
     area1 = calcArea (a, a + x);
@@ -72,11 +79,13 @@ int main (int argc, char* argv[])
   if (argc < 4)
   {
     printf ("Available functions: \n");
-    printf ("Type 1: (1 - (e^(-x^2)))/x\n");
-    printf ("Type 2: (x * sin(x) + 10\n");
-    printf ("Type 3: (x^2 + x^3\n");
+    printf ("Type 1: 1 - (e^(-x^2))/x\n");
+    printf ("Type 2: x * sin(x) + 10\n");
+    printf ("Type 3: x^2 + x^)\n");
+    printf ("Type 4: sin (x) + 1.0\n");
 
-    printf ("Usage: %s [x min] [x max] [type (1, 2 or 3)]\n", argv[0]);
+    printf ("Usage: %s [x min] [x max] [type (1, 2, 3 or 4)]\n", argv[0]);
+    printf ("Example: %s 2 5 4\n", argv[0]);
     return -1;
   }
 
@@ -84,14 +93,14 @@ int main (int argc, char* argv[])
   maxB = atof (argv[2]);
   type = atoi (argv[3]);
 
-  if (type < 1 || type > 3)
+  if (type < 1 || type > 4)
   {
     printf ("Unknown function type.\n");
     return -1;
   }
   
   tolerance = pow (10.0, -20);
-  delta = pow(10.0, -4);
+  delta = pow(10.0, -5);
 
   #pragma omp parallel
   {
