@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 #include <omp.h>
 
 double tolerance, delta, total_area = 0.0;
@@ -138,7 +139,7 @@ void calcArea ()
 
     value = largerArea;
     diff = largerArea - (smallerArea1 + smallerArea2);
-    if (fabs(diff) > tolerance)
+    if (fabs(diff) > tolerance && fabs(b - a) > delta)
     {
       #pragma omp critical (task)
       {
@@ -160,6 +161,7 @@ void calcArea ()
 
 int main (int argc, char* argv[])
 {
+  clock_t t;
   double min_a, max_b, range, width;
   int i, num_task = omp_get_max_threads();
 
@@ -195,6 +197,8 @@ int main (int argc, char* argv[])
   
   tolerance = pow (10.0, -20);
   delta = pow(10.0, -5);
+  
+  t = clock();
 
   width = range / num_task;  
   for (i = 0; i < num_task; i++)
@@ -205,8 +209,11 @@ int main (int argc, char* argv[])
 
   #pragma omp parallel
   calcArea ();
+  
+  t = clock() - t;
 
-  printf ("Area (a=%.2f, b=%.2f): %f\n", min_a, max_b, total_area);
+  printf ("Area (a=%.2f, b=%.2f): %f\ntime: %fs", min_a, max_b, total_area,
+          (double) t/CLOCKS_PER_SEC);
 
   return 0;
 }
