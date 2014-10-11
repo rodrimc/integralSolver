@@ -81,7 +81,7 @@ int main (int argc, char* argv[])
     printf ("Available functions: \n");
     printf ("Type 1: 1 - (e^(-x^2))/x\n");
     printf ("Type 2: x * sin(x) + 10\n");
-    printf ("Type 3: x^2 + x^)\n");
+    printf ("Type 3: x^2 + x^3)\n");
     printf ("Type 4: sin (x) + 1.0\n");
 
     printf ("Usage: %s [x min] [x max] [type (1, 2, 3 or 4)]\n", argv[0]);
