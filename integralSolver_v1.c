@@ -45,7 +45,7 @@ double f (double x)
 
 double area (double a, double b)
 {
-  return  (b - a) * (f(a) + f(b)) / 2.0; 
+  return (((f(a) + f(b)) / 2.0) *  (b - a)); 
 }
 
 double calcArea (double a, double b)
